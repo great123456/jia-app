@@ -21,7 +21,6 @@ export default {
       'pages/center/center',                          //我的
       'pages/order/order',                            //订单列表
       'pages/my-order/my-order',                      //订单列表
-      'pages/order-detail/order-detail',              //订单详情
       'pages/apply/apply',                            //申请入住
       'pages/message/message',                        //个人信息
       'pages/login/login'                             //个人信息

@@ -2,35 +2,32 @@
 import wxRequest from '@/config/wxRequest'
 import { API_PATH } from '@/config/env'
 
-// 用户信息
+// 用户登录
 export const weixinlogin = (ajaxParams) => wxRequest(API_PATH + '/auth/login', ajaxParams, 'GET')
 
-//学校列表
-export const apiSchoolList = (ajaxParams) => wxRequest(API_PATH + '/order/school', ajaxParams, 'GET')
-
-//专业列表
-export const apiMajorList = (ajaxParams) => wxRequest(API_PATH + `/order/major/shchool/${ajaxParams.id}`, ajaxParams, 'GET')
-
-//完善用户信息
-export const apiUserSave = (ajaxParams) => wxRequest(API_PATH + '/auth/save-user', ajaxParams, 'POST')
-
-//显示个人信息(包括实名认证的信息图片)
+//用户信息
 export const apiUserInfo = (ajaxParams) => wxRequest(API_PATH + '/auth/show', ajaxParams, 'GET')
 
-//上传图片返回url
-export const apiUploadImg = (ajaxParams) => wxRequest(API_PATH + '/upload/upload-mage', ajaxParams, 'POST')
+//保存用户信息
+export const apiSaveUserInfo = (ajaxParams) => wxRequest(API_PATH + '/auth/save', ajaxParams, 'POST')
 
-//分期信息（选择专业后）
-export const apiTuitionInfo = (ajaxParams) => wxRequest(API_PATH + `/order/tuition/major/${ajaxParams.id}`, ajaxParams, 'GET')
+//发送验证码
+export const apiSendCode = (ajaxParams) => wxRequest(API_PATH + '/sms/send-sms-code', ajaxParams, 'POST')
 
-//选择课程并支付订单
-export const apiCoursePay = (ajaxParams) => wxRequest(API_PATH + '/order/pay', ajaxParams, 'POST')
+//房源列表
+export const apiHouseList = (ajaxParams) => wxRequest(API_PATH + '/house/list/1', ajaxParams, 'GET')
+
+//房源详细信息
+export const apiHouseDetail = (ajaxParams) => wxRequest(API_PATH + `/house/show/${ajaxParams.id}`, ajaxParams, 'GET')
+
+//收藏房源
+export const apiHouseCollect = (ajaxParams) => wxRequest(API_PATH + '/house/collect', ajaxParams, 'POST')
+
+//我的收藏
+export const apiCollectList = (ajaxParams) => wxRequest(API_PATH + `/house/my-collection/1`, ajaxParams, 'GET')
 
 //我的订单
-export const apiGetMyOrder = (ajaxParams) => wxRequest(API_PATH + `/order/my-order/size/${ajaxParams.size}`, ajaxParams, 'GET')
+export const apiOrderList = (ajaxParams) => wxRequest(API_PATH + '/order/list/1', ajaxParams, 'GET')
 
-//分期支付（可多选）
-export const apiCourseDetailPay = (ajaxParams) => wxRequest(API_PATH + '/order/pay-stages', ajaxParams, 'POST')
-
-//实名认证（保存证件照地址）
-export const apiUploadCard = (ajaxParams) => wxRequest(API_PATH + '/order/upload-pic', ajaxParams, 'POST')
+//订单支付
+export const apiOrderPay = (ajaxParams) => wxRequest(API_PATH + '/order/pay', ajaxParams, 'POST')

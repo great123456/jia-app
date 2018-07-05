@@ -3,6 +3,9 @@
   <div class="container">
     <p class="title">加入家度,与好友分享美宿</p>
     <div class="message-option">
+      <input type="text" v-model="name" placeholder="请输入您的真实姓名"/>
+    </div>
+    <div class="message-option">
       <input type="text" v-model="phone" placeholder="请输入您的手机号码"/>
     </div>
     <div class="message-option messsage-code">
@@ -15,11 +18,12 @@
 
 <script>
 import wxShare from '@/mixins/wx-share'
-import { apiUserSave,apiUserInfo } from '@/service/my'
+import { apiSendCode,apiSaveUserInfo,apiUserInfo } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {
     return {
+      name: '',
       phone: '',
       code: '',
       num: 60,
@@ -42,7 +46,14 @@ export default {
   },
   methods: {
    getCode(){
-     console.log('code')
+     if(this.name == ''){
+       wx.showToast({
+         title: '请先填写用户名',
+         icon: 'none',
+         duration: 2000
+       })
+       return
+     }
      if(this.phone == ''){
        wx.showToast({
          title: '手机号码不能为空',
@@ -50,7 +61,7 @@ export default {
          duration: 2000
        })
        return
-      }
+     }
      if(!this.disabled){
        return
      }
@@ -58,6 +69,20 @@ export default {
      this.num = 60
      this.codeValue = this.num +'s'
      const self = this
+     apiSendCode({
+      mobile: this.phone
+     })
+     .then((res)=>{
+       if(res.code == 200){
+          
+       }else{
+         wx.showToast({
+           title: res.msg,
+           icon: 'none',
+           duration: 2000
+         })
+       }
+     })
      this.timer = setInterval(function(){
        self.num --
        self.codeValue = self.num +'s'
@@ -70,6 +95,14 @@ export default {
      },1000)
    },
    userLogin(){
+    if(this.name == ''){
+      wx.showToast({
+        title: '用户名不能为空',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
     if(this.phone == ''){
       wx.showToast({
         title: '手机号码不能为空',
@@ -86,6 +119,30 @@ export default {
       })
       return
     }
+    apiSaveUserInfo({
+      mobile: this.phone,
+      verifyCode: this.code,
+      name: this.name
+    })
+    .then((res)=>{
+      if(res.code == 200){
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success',
+          duration: 2000
+        })
+        wx.setStorageSync('login', true)
+        wx.navigateBack({
+          delta: 1
+        })
+      }else{
+        wx.showToast({
+          title: res.msg,
+          icon: 'none',
+          duration: 2000
+        })
+      }
+    })
    }
   }
 }

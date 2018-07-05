@@ -26,7 +26,7 @@
 
 <script>
 import wxShare from '@/mixins/wx-share'
-import { apiUserSave,apiUserInfo } from '@/service/my'
+import { apiSaveUserInfo,apiUserInfo } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {

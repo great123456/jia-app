@@ -17,45 +17,71 @@
       </div>
       <div class="message-option">
         <div>日期</div>
-        <picker mode="date" :value="date" start="2018-06-01" end="2019-09-01" @change="bindDateChange">
-          <view class="picker" v-if="date == '请选择日期'">
-            {{date}}
-            <image src="/static/image/arrow.png" class="picker-image" mode="widthFix"></image>
-          </view>
-           <view class="picker-active" v-else>
-            {{date}}
-            <image src="/static/image/arrow.png" class="picker-image" mode="widthFix"></image>
-          </view>
-        </picker>
+         <div class="piker-date">
+          <span style="text-align: left;">
+            <picker mode="date" :value="start_date" start="2018-06-01" end="2020-09-01" @change="startDateChange">
+                <view class="picker">
+                  {{start_date}}
+                </view>
+            </picker>
+          </span>
+          <span class="num-btn">{{days}}天</span>
+          <span style="text-align: right;">
+            <picker mode="date" :value="end_date" :start="startTime" end="2020-09-01" @change="endDateChange">
+                <view class="picker">
+                  {{end_date}}
+                </view>
+            </picker>
+          </span>
+        </div>
       </div>
       <div class="message-option message-price">
         <div>费用</div>
-        <div>￥239</div>
+        <div>￥{{fee}}</div>
       </div>
     </div>
-    <p class="order-btn" @click="loginPage">发送申请给房东</p>
+    <p class="order-btn" @click="loginPage">立即预定</p>
   </div>
 </template>
 
 <script>
 import wxShare from '@/mixins/wx-share'
-import { apiUserSave,apiUserInfo } from '@/service/my'
+// import { apiUserSave,apiUserInfo } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {
     return {
       num: 1,
-      date: '请选择日期'
+      date: '请选择日期',
+      days: 0,
+      start_date: '入住日期',
+      end_date: '退房日期'
     }
   },
   components: {
 
   },
+  computed:{
+    startTime(){
+      return this.start_date == '入住日期'?new Date:this.start_date
+    },
+    fee(){
+      return this.days*239
+    }
+  },
   mounted() {
 
   },
   onShow(){
-    
+    if(wx.getStorageSync('start_date')){
+      this.start_date = wx.getStorageSync('start_date')
+    }
+    if(wx.getStorageSync('end_date')){
+      this.end_date = wx.getStorageSync('end_date')
+    }
+    if(wx.getStorageSync('days')){
+      this.days = wx.getStorageSync('days')
+    }
   },
   created(){
 
@@ -69,6 +95,32 @@ export default {
          url: '/pages/login/login'
       })
    },
+   startDateChange(e){
+      this.start_date = e.mp.detail.value
+      if(this.end_date!='退房日期'){
+        this.days = this.DateDiff(this.start_date,this.end_date)
+         wx.setStorageSync('start_date', this.start_date)
+         wx.setStorageSync('end_date', this.end_date)
+         wx.setStorageSync('days', this.days)
+      }
+    },
+    DateDiff(sDate1,  sDate2){  
+     let aDate  =  sDate1.split("-") 
+     let oDate1  = new Date(aDate[0]  +  '-'  +  aDate[1]  +  '-'  +  aDate[2])    
+     aDate  =  sDate2.split("-")  
+     let oDate2  = new Date(aDate[0]  +  '-'  +  aDate[1]  +  '-'  +  aDate[2])
+     let iDays  =  parseInt(Math.abs(oDate1  -  oDate2)  /  1000  /  60  /  60  /24)
+     return  iDays  
+    },
+    endDateChange(e){
+      this.end_date = e.mp.detail.value
+      if(this.start_date!='入住日期'){
+        this.days = this.DateDiff(this.start_date,this.end_date)
+         wx.setStorageSync('start_date', this.start_date)
+         wx.setStorageSync('end_date', this.end_date)
+         wx.setStorageSync('days', this.days)
+      }
+    },
    addNum(){
      this.num++
    },
@@ -119,6 +171,29 @@ export default {
  line-height: 90rpx;
  display: flex;
  justify-content: space-between;
+ .piker-date{
+  display: inline-block;
+  position: relative;
+  span{
+    display: inline-block;
+    width:230rpx;
+  }
+  .num-btn{
+    position: absolute;
+    display: inline-block;
+    height:40rpx;
+    width:90rpx;
+    border-radius: 30rpx;
+    border:1px solid #f1f1f0;
+    text-align: center;
+    line-height: 40rpx;
+    left: 50%;
+    top:25rpx;
+    font-size: 26rpx;
+    letter-spacing: 2px;
+    transform: translateX(-50%);
+  }
+ }
  .apply-number{
   .reduce{
     font-size: 36rpx;

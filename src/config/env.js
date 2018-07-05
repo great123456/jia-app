@@ -4,7 +4,7 @@
  * PRICE_RANGE 匹配价格区间
  */
 
-var API_PATH="https://eduapi.hxgtech.com/api"
+var API_PATH="https://api.jiaduminsu.com/api"
 const isDEV = process.env.NODE_ENV === 'development'
 
 // 正则表达式

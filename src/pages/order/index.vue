@@ -10,7 +10,7 @@
 
 <script>
 import wxShare from '@/mixins/wx-share'
-import { apiGetMyOrder } from '@/service/my'
+import { apiOrderList } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {
