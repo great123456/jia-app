@@ -40,13 +40,13 @@
         <div>￥{{fee}}</div>
       </div>
     </div>
-    <p class="order-btn" @click="loginPage">立即预定</p>
+    <p class="order-btn" @click="submitApply">立即预定</p>
   </div>
 </template>
 
 <script>
 import wxShare from '@/mixins/wx-share'
-// import { apiUserSave,apiUserInfo } from '@/service/my'
+import { apiOrderPay } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {
@@ -66,7 +66,7 @@ export default {
       return this.start_date == '入住日期'?new Date:this.start_date
     },
     fee(){
-      return this.days*239
+      return this.days*wx.getStorageSync('fee')
     }
   },
   mounted() {
@@ -88,7 +88,57 @@ export default {
   },
   methods: {
    submitApply(){
-     
+     if(!wx.getStorageSync('login')){
+       this.loginPage()
+       return
+     }
+     if(this.start_date == '入住日期'){
+       wx.showToast({
+         title: '请选择入住日期',
+         icon: 'none',
+         duration: 2000
+       })
+       return
+     }
+     if(this.end_date == '退房日期'){
+       wx.showToast({
+         title: '请选择入住日期',
+         icon: 'none',
+         duration: 2000
+       })
+       return
+     }
+     apiOrderPay({
+       house_id: wx.getStorageSync('house_id'),
+       amount: this.num,
+       begin: this.start_date,
+       end: this.end_date
+     })
+     .then((res)=>{
+       if(res.code == 200){
+         wx.requestPayment({
+             'timeStamp': res.data.timeStamp+ '',
+             'nonceStr': res.data.nonceStr,
+             'package': res.data.package,
+             'signType': 'MD5',
+             'paySign': res.data.paySign,
+             success:function(res){
+               wx.switchTab({
+                 url: '/pages/order/order'
+               })
+             },
+             fail:function(err){
+               console.log('err',err)
+             }
+          })
+       }else{
+         wx.showToast({
+            title: res.message,
+            icon: 'none',
+            duration: 2000
+          })
+       }
+     })
    },
    loginPage(){
       wx.navigateTo({

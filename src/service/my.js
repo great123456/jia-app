@@ -15,7 +15,7 @@ export const apiSaveUserInfo = (ajaxParams) => wxRequest(API_PATH + '/auth/save'
 export const apiSendCode = (ajaxParams) => wxRequest(API_PATH + '/sms/send-sms-code', ajaxParams, 'POST')
 
 //房源列表
-export const apiHouseList = (ajaxParams) => wxRequest(API_PATH + '/house/list/1', ajaxParams, 'GET')
+export const apiHouseList = (ajaxParams) => wxRequest(API_PATH + '/house/list/20', ajaxParams, 'GET')
 
 //房源详细信息
 export const apiHouseDetail = (ajaxParams) => wxRequest(API_PATH + `/house/show/${ajaxParams.id}`, ajaxParams, 'GET')
@@ -24,10 +24,16 @@ export const apiHouseDetail = (ajaxParams) => wxRequest(API_PATH + `/house/show/
 export const apiHouseCollect = (ajaxParams) => wxRequest(API_PATH + '/house/collect', ajaxParams, 'POST')
 
 //我的收藏
-export const apiCollectList = (ajaxParams) => wxRequest(API_PATH + `/house/my-collection/1`, ajaxParams, 'GET')
+export const apiCollectList = (ajaxParams) => wxRequest(API_PATH + `/house/my-collection/100`, ajaxParams, 'GET')
 
 //我的订单
-export const apiOrderList = (ajaxParams) => wxRequest(API_PATH + '/order/list/1', ajaxParams, 'GET')
+export const apiOrderList = (ajaxParams) => wxRequest(API_PATH + '/order/list/20', ajaxParams, 'GET')
 
 //订单支付
 export const apiOrderPay = (ajaxParams) => wxRequest(API_PATH + '/order/pay', ajaxParams, 'POST')
+
+//轮播列表
+export const apiBannerList = (ajaxParams) => wxRequest(API_PATH + '/banner/list/10', ajaxParams, 'GET')
+
+//链接地址
+export const apiBannerLink = (ajaxParams) => wxRequest(API_PATH + `/banner/content/${ajaxParams.id}`, ajaxParams, 'GET')

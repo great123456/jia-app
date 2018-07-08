@@ -7,7 +7,7 @@
           <block v-for="(item,index) in imgUrl" :key="index">
             <swiper-item style="position: relative;">
               <image :src="item" class="slide-image" mode="widthFix"></image>
-              <span style="position: absolute;right:20rpx;bottom: 20rpx;color:#ffffff;">{{index+1}}/5</span>
+              <span style="position: absolute;right:20rpx;bottom: 20rpx;color:#ffffff;">{{index+1}}/{{imgUrl.length}}</span>
               <div class="collect" @click="selectCollect"><image :src="collectUrl" mode="widthFix"></image></div>
             </swiper-item>
           </block>
@@ -15,23 +15,23 @@
     </div>
     <div class="detail">
       <div class="detail-top">
-        <p class="detail-title">市中心五羊新城里有一间明亮的玻璃花房</p>
-        <p class="detail-introduce">广州市 越秀区五羊新城新马路南二街</p>
+        <p class="detail-title">{{detailInfo.introduction}}</p>
+        <p class="detail-introduce">{{detailInfo.address}}</p>
       </div>
       <div class="detail-content">
         <div class="detail-content-option">
           <image src="/static/image/detail/store.png" class="detail-content-icon" mode="widthFix"></image>
           <span class="introduce">整层或套间</span>
-          <span class="content">房子面积60平方米</span>
+          <span class="content">房子面积{{detailInfo.area}}平方米</span>
         </div>
         <div class="detail-content-option">
           <image src="/static/image/detail/account.png" class="detail-content-icon" mode="widthFix"></image>
-          <span class="introduce">宜住2人</span>
+          <span class="introduce">宜住{{detailInfo.amount}}人</span>
           <span class="content">户型5居室,出租1间卧室</span>
         </div>
         <div class="detail-content-option">
           <image src="/static/image/detail/home.png" class="detail-content-icon" mode="widthFix"></image>
-          <span class="introduce">1床2卫</span>
+          <span class="introduce">{{detailInfo.house_type}}</span>
           <span class="content">1公用卫生间,1独立卫生间</span>
         </div>
       </div>
@@ -41,29 +41,24 @@
       </div>
       <div class="detail-describe detail-list">
         <p class="detail-describe-title">入住须知</p>
-        <p class="detail-describe-text">入住时间：12:00后 </p>
-        <p class="detail-describe-text">退房时间：12:00前</p>
+        <p class="detail-describe-text">{{detailInfo.occupancy_note}}</p>
       </div>
       <div class="detail-describe detail-list">
         <p class="detail-describe-title">退订政策</p>
-        <p class="detail-describe-text">入住前1天12:00前退订，可获100%退款。之后退订不退款</p>
+        <p class="detail-describe-text">{{detailInfo.policy}}</p>
       </div>
       <div class="detail-describe detail-list">
         <p class="detail-describe-title">客人须知</p>
-        <p class="detail-describe-text">允许做饭、适合儿童（2-12岁）、适合婴幼儿（2岁以下）、适合老人（60岁以上）、</p>
+        <p class="detail-describe-text">{{detailInfo.guest_note}}</p>
       </div>
       <div class="detail-describe">
         <p class="detail-describe-title">房源描述</p>
-        <p class="detail-describe-text">
-          您好，很高兴您关注到这套公寓，这套公寓是一室一厅一厨一卫的格局，卧室里有一张大床，卧的床是2米*1.8米，卧室里都配备有冷暖空调；客厅里有沙发电视机，厨房间里锅碗瓢盆都有，在公寓门口的菜市场买点菜即可做饭。
-         公寓旁边有超市菜市场饭店早餐店医院药店公交站台，生活很方便，我们另外提供免费接机场或者火车站，迪士尼提供免费接送，野生动物园提供免费接送，如果你们去市区，我们提供免费接送我们附近的地铁站，为你们的出行提供便利。我房源有多套，有迪士尼卡通房和常规普通房，可以根据你们的需要来选取。
-         如果你们去迪士尼的话，我们也可以代购迪士尼优惠门票，去迪士尼提供免费接送，我们也提供有偿迪士尼导游服务，就是帮你们在迪士尼排队，缩短你们在迪士尼游玩的时间，从而提高你们在迪士尼游玩的质量，希望在上海遇到你们，谢谢！
-        </p>
+        <p class="detail-describe-text">{{detailInfo.description}}</p>
       </div>
     </div>
     <div class="detail-bottom">
       <div class="detail-consult">咨询房东<button open-type="contact" class="detail-btn"></button></div>
-      <div class="detail-price">￥239</div>
+      <div class="detail-price">￥{{detailInfo.price}}</div>
       <div class="detail-apply" @click="loginPage">申请入住</div>
     </div>
   </div>
@@ -71,18 +66,19 @@
 
 <script>
 import wxShare from '@/mixins/wx-share'
-import { weixinlogin } from '@/service/my'
+import { apiHouseDetail,apiHouseCollect } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {
     return {
      userInfo: {},
-     imgUrl: ['/static/image/index/a1.jpg',
-     '/static/image/index/a2.jpg','/static/image/index/a3.jpg','/static/image/index/a5.jpg','/static/image/index/a6.jpg'],
+     imgUrl: [],
      collectUrl: '/static/image/detail/favorites.png',
      indicatorDots: true,
      color: '#0D9EFF',
-     duration: 500
+     duration: 500,
+     detailId: '',
+     detailInfo: {}
     }
   },
   components: {
@@ -92,7 +88,9 @@ export default {
 
   },
   onShow(){
-    
+    this.detailId = this.$mp.query.id
+    wx.setStorageSync('house_id', this.detailId)
+    this.getHouseDetail(this.detailId)
   },
   created(){
     
@@ -103,21 +101,40 @@ export default {
          url: '/pages/edit-message/edit-message'
       })
     },
+    getHouseDetail(id){
+      apiHouseDetail({
+        id: id
+      })
+      .then((res)=>{
+        if(res.code == 200){
+          this.imgUrl = res.data.detail_pic
+          this.detailInfo = res.data
+          wx.setStorageSync('fee', this.detailInfo.price)
+        }
+      })
+    },
     selectCollect(){
       if(this.collectUrl == '/static/image/detail/favorites.png'){
         this.collectUrl = '/static/image/detail/favorites-select.png'
-        wx.showToast({
-          title: '收藏成功',
-          icon: 'none',
-          duration: 2000
+        apiHouseCollect({
+          id: this.detailId
+        })
+        .then((res)=>{
+          if(res.code == 200){
+            wx.showToast({
+              title: '收藏成功',
+              icon: 'none',
+              duration: 2000
+            })
+          }
         })
       }else{
         this.collectUrl = '/static/image/detail/favorites.png'
-        wx.showToast({
-          title: '取消收藏',
-          icon: 'none',
-          duration: 2000
-        })
+        // wx.showToast({
+        //   title: '取消收藏',
+        //   icon: 'none',
+        //   duration: 2000
+        // })
       }
     },
     loginPage(){

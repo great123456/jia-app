@@ -19,10 +19,10 @@ export default {
       '^pages/index/index',                           // 首页
       'pages/detail/detail',                          //详情页
       'pages/center/center',                          //我的
+      'pages/collect/collect',                        //我的收藏
       'pages/order/order',                            //订单列表
       'pages/my-order/my-order',                      //订单列表
       'pages/apply/apply',                            //申请入住
-      'pages/message/message',                        //个人信息
       'pages/login/login'                             //个人信息
     ],
     window: {

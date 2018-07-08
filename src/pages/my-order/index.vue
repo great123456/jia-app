@@ -1,17 +1,26 @@
 <!-- 订单列表 -->
 <template>
   <div class="container">
-    <div class="order-container">
-      <div class="order-option" v-for="(item,index) in orderList" :key="index" @click="detailPage(index)">
-        <p class="option-education">{{item.school.name}}<span>{{item.type == '1'?'专科':'本科'}}</span></p>
-        <p class="course">{{item.major.major}}</p>
-        <p class="order-price"><span style="font-size:22rpx;margin-right:10rpx;">{{item.all_paid == 0?'未付清':'已全付'}}</span>{{item.stages}}期x{{item.each}}</p>
-        <p class="order-date">{{item.created_at}}</p>
-      </div>
-    </div>
     <p style="margin-top:30rpx;color:#b5b6b7" v-show="orderList.length == 0">暂无订单数据</p>
-    <div class="order-image">
+    <div class="order-image" v-show="orderList.length == 0">
       <image src="/static/image/no-data.png" mode="widthFix"></image>
+    </div>
+    <div class="order-option" v-for="(item,index) in orderList" :key="index">
+      <p class="option-title">
+        <span>{{item.house.name}}</span>
+        <span v-if="item.is_paid == 1" class="order-status">已付款</span>
+        <span v-else class="order-status">未付款</span>
+      </p>
+      <div class="option-img">
+        <image :src="item.house.mian_pic" mode="widthFix"></image>
+      </div>
+      <p class="order-num">订单编号:&nbsp{{item.order_no}}</p>
+      <p class="order-price">订单总额:&nbsp{{item.total}}</p>
+      <div class="order-time">
+        <span>{{item.begin}}</span>
+        <span class="line"></span>
+        <span>{{item.end}}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -33,20 +42,22 @@ export default {
 
   },
   onShow(){
-    //this.getOrderList()
+    this.getOrderList()
   },
   created(){
 
   },
   methods: {
-    apiOrderList(){
-      apiGetMyOrder({
-        size: 10
+    getOrderList(){
+      apiOrderList({
+        page: 1
       })
       .then((res)=>{
         if(res.code == 200){
-          console.log('order',res);
-          this.orderList = res.data.data
+          this.orderList = res.data.list
+          this.orderList.forEach(function(item){
+            item.house.mian_pic = 'https://api.jiaduminsu.com'+ item.house.mian_pic
+          })
         }
       })
     },
@@ -61,107 +72,64 @@ export default {
 
 <style lang="scss" scoped>
 .container{
-  padding-top: 1px;
+  padding-top: 20rpx;
   padding-bottom: 100rpx;
   text-align: center;
-  background: #ffffff;
-}
-.banner{
-  width:100%;
-  background: #F3FBFF;
-  height:400rpx;
-  text-align: center;
-  padding-top: 40rpx;
-  box-sizing: border-box;
-  .banner-content{
-    width:180rpx;
-    height:180rpx;
-    border-radius: 100%;
-    border:1px solid #04A1E9;
-    display: inline-block;
-    .banner-price{
-      font-size: 36rpx;
-      color:#04A1E9;
-      margin-top: 60rpx;
-    }
-    .banner-num{
-      font-size: 23rpx;
-      color:#cccccc;
-      margin-top: 10rpx;
-    }
-  }
-}
-.education{
-  font-size: 44rpx;
-  color: #333333;
-  margin: 20rpx auto;
-  position: relative;
-  width:220rpx;
-  margin-bottom: 0px;
-  span{
-    display: inline-block;
-    width:65rpx;
-    height:40rpx;
-    border-radius: 15px;
-    border: 1px solid #04A1E9;
-    color:#04A1E9;
-    font-size: 20rpx;
-    margin-left: 16rpx;
-    line-height: 40rpx;
-    position: absolute;
-    top:10rpx;
-    right:0px;
-    transform: translateX(100%);
-  }
-}
-.course{
-  color: #666666;
-  font-size: 23rpx;
-  margin-top: 5rpx;
-}
-.order-container{
-  padding:0rpx 30rpx;
-  background: #ffffff;
 }
 .order-option{
-  background: #F5F5F5;
-  border-radius: 10px;
-  margin-top: 30rpx;
-  padding:30rpx 20rpx;
-  text-align: left;
+  margin-bottom: 20rpx;
+  widows: 100%;
+  box-sizing: border-box;
+  padding:30rpx;
+  background: #ffffff;
   position: relative;
-  .option-education{
-    font-size: 40rpx;
-    color: #333333;
-    position: relative;
-    margin-bottom: 0px;
-    span{
-      display: inline-block;
-      width:65rpx;
-      height:40rpx;
-      border-radius: 15px;
-      border: 1px solid #04A1E9;
-      color:#04A1E9;
-      font-size: 20rpx;
-      margin-left: 6rpx;
-      line-height: 40rpx;
-      transform: translateY(-5rpx);
-      text-align: center;
+  .option-title{
+    font-size: 30rpx;
+    color:#2c2d2f;
+    margin-bottom: 20rpx;
+    display: flex;
+    justify-content: space-between;
+    .order-status{
+      color:#b5b6b7;
+    }
+  }
+  .option-img{
+    width:100%;
+    image{
+      width:100%;
     }
   }
   .order-price{
-    position: absolute;
-    right:20rpx;
-    top:25rpx;
-    color: #04A1E9;
-    font-size: 36rpx;
+    margin-top: 10rpx;
+    color:#b5b6b7;
+    font-size: 32rpx;
+    text-align: left;
   }
-  .order-date{
-    font-size: 24rpx;
-    color: #CCCCCC;
+  .order-num{
+    margin-top: 10rpx;
+    font-size: 26rpx;
+    color:#b5b6b7;
+    text-align: left;
+  }
+  .order-time{
     position: absolute;
-    right:20rpx;
-    bottom:20rpx;
+    width:100%;
+    box-sizing: border-box;
+    color:#ffffff;
+    font-size: 36rpx;
+    left:0px;
+    bottom:140rpx;
+    display: flex;
+    justify-content: space-between;
+    z-index: 9;
+    padding-left:50rpx;
+    padding-right: 50rpx;
+    .line{
+      width:100rpx;
+      height:4rpx;
+      background: #ffffff;
+      margin-top: 22rpx;
+    }
   }
 }
 .order-image{

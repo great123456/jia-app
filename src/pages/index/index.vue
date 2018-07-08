@@ -6,7 +6,7 @@
        :indicator-active-color="color" style="height:400rpx;">
           <block v-for="(item,index) in imgUrl" :key="index">
             <swiper-item>
-              <image :src="item" class="slide-image" mode="widthFix"></image>
+              <image :src="item.img" class="slide-image" mode="widthFix" @click="getBannerLink(item.id)"></image>
             </swiper-item>
           </block>
        </swiper>
@@ -43,27 +43,27 @@
       </div>
     </div>
 
-    <div class="option" v-for="(item,index) in optionList" :key="index" @click="detailPage">
+    <div class="option" v-for="(item,index) in optionList" :key="index" @click="detailPage(item.id)">
       <p class="option-line"></p>
-      <p class="option-title">{{item.title}}</p>
-      <image :src="item.url" class="option-image" mode="widthFix"></image>
-      <p class="option-content">{{item.content}}</p>
-      <p class="option-introduce">{{item.introduce}}</p>
+      <p class="option-title">{{item.name}}</p>
+      <image :src="item.mian_pic" class="option-image" mode="widthFix"></image>
+      <p class="option-content">{{item.introduction}}</p>
+      <p class="option-introduce">{{item.house_type}}-宜居{{item.amount}}人-{{item.region}}</p>
     </div>
-
+    
+    <web-view :src="linkUrl" v-if="showBannerLink"></web-view>
   </div>
 </template>
 
 <script>
 import wxShare from '@/mixins/wx-share'
-import { weixinlogin,apiHouseList } from '@/service/my'
+import { weixinlogin,apiHouseList,apiBannerList,apiBannerLink } from '@/service/my'
 export default {
   mixins: [wxShare],
   data () {
     return {
      userInfo: {},
-     imgUrl: ['/static/image/index/option.png',
-     '/static/image/index/option2.png','/static/image/index/option3.png'],
+     imgUrl: [],
      indicatorDots: true,
      color: '#0D9EFF',
      autoplay: true,
@@ -72,27 +72,9 @@ export default {
      days: 0,
      start_date: '入住日期',
      end_date: '退房日期',
-     optionList: [{
-      url:'/static/image/index/a1.jpg',
-      title:'广州最文艺民宿',
-      introduce:'整层或套间-宜居2人-广州市-天河区',
-      content:'市中心的花园别墅里充满童趣的空间'
-     },{
-      url:'/static/image/index/a2.jpg',
-      title:'广州最美民宿',
-      introduce:'整层或套间-宜居1人-广州市-海珠区',
-      content:'市中心的花园别墅里充满童趣的空间'
-     },{
-      url:'/static/image/index/a3.jpg',
-      title:'广州最有趣民宿',
-      introduce:'整层或套间-宜居3人-广州市-番禺区',
-      content:'市中心的花园别墅里充满童趣的空间'
-     },{
-      url:'/static/image/index/a4.jpg',
-      title:'广州最好玩民宿',
-      introduce:'整层或套间-宜居5人-广州市-越秀区',
-      content:'市中心的花园别墅里充满童趣的空间'
-     }]
+     optionList: [],
+     showBannerLink: false,
+     linkUrl: ''
     }
   },
   components: {
@@ -122,6 +104,10 @@ export default {
         .then((res)=>{
           console.log('res',res)
            wx.setStorageSync('token', res.data.token)
+           wx.showLoading({
+             title: '加载中',
+           })
+           self.getBannerList()
            self.getHouseList()
         })
       }
@@ -138,6 +124,36 @@ export default {
               this.userInfo = res.userInfo
               wx.setStorageSync('userInfo', res.userInfo)
             }
+          })
+        }
+      })
+    },
+    getBannerList(){
+      apiBannerList({
+        page: 1
+      })
+      .then((res)=>{
+        if(res.code == 200){
+          this.imgUrl = res.data.list
+        }
+      })
+    },
+    getBannerLink(id){
+      apiBannerLink({
+        id: id
+      })
+      .then((res)=>{
+        if(res.code == 200){
+          const self = this
+          if(res.data.link != ''){
+            self.showBannerLink = true
+            self.linkUrl = res.data.link
+          }
+        }else{
+          wx.showToast({
+            title: res.message,
+            icon: 'none',
+            duration: 2000
           })
         }
       })
@@ -170,17 +186,18 @@ export default {
     },
     getHouseList(){
       apiHouseList({
-        page: 10
+        page: 1
       })
       .then((res)=>{
+        wx.hideLoading()
         if(res.code == 200){
-
+          this.optionList = res.data.list
         }
       })
     },
-    detailPage(){
+    detailPage(id){
       wx.navigateTo({
-         url: '/pages/detail/detail'
+         url: '/pages/detail/detail?id='+id
        })
     }
   }

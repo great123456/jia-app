@@ -17,7 +17,7 @@
            <span>我的订单</span>
            <image src="/static/image/center/arrow.png" mode="widthFix" class="center-option-icon"></image>
          </div>
-         <div class="center-option">
+         <div class="center-option" @click="collectPage">
            <image src="/static/image/center/center.png" mode="widthFix" class="center-option-img"></image>
            <span>我的收藏</span>
            <image src="/static/image/center/arrow.png" mode="widthFix" class="center-option-icon"></image>
@@ -27,7 +27,7 @@
            <span>联系客服</span>
            <image src="/static/image/center/arrow.png" mode="widthFix" class="center-option-icon"></image>
          </div>
-         <div class="center-option">
+         <div class="center-option" @click="linkService">
            <image src="/static/image/center/center.png" mode="widthFix" class="center-option-img"></image>
            <span>成为房东</span>
            <image src="/static/image/center/arrow.png" mode="widthFix" class="center-option-icon"></image>
@@ -64,14 +64,14 @@ export default {
         url: '/pages/my-order/my-order'
       })
     },
-    messagePage(){
+    collectPage(){
       wx.navigateTo({
-         url: '/pages/message/message'
+         url: '/pages/collect/collect'
        })
     },
     linkService(){
       wx.makePhoneCall({
-        phoneNumber: '4001005678'
+        phoneNumber: '17765258552'
       })
     }
   }
