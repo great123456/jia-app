@@ -37,7 +37,7 @@
                 </picker>
               </span>
             </div>
-            <p class="piker-btn">搜索</p>
+            <p class="piker-btn">确定</p>
           </div>
         </div>
       </div>
